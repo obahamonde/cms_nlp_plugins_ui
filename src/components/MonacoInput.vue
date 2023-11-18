@@ -27,12 +27,6 @@ const initialEditorValue = {
   python: "",
 };
 
-declare global {
-  interface Window {
-    MonacoEnvironment: any;
-  }
-}
-
 window.MonacoEnvironment = {
   getWorker(_: string, label: string) {
     if (label === "json") return new JSONWorker();

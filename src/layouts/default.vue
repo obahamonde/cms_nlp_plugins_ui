@@ -1,7 +1,8 @@
-import { use } from 'matter';
+
 <template>
-  <Navbar />
-  <main class="row center">
+   <main class="row center h-full min-h-screen">
     <RouterView />
+    <NavigationDrawer />
   </main>
+   <Toolbar />
 </template>

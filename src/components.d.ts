@@ -7,6 +7,8 @@ export {}
 
 declare module 'vue' {
   export interface GlobalComponents {
+    Assistant: typeof import('./components/Assistant.vue')['default']
+    Assistants: typeof import('./components/Assistants.vue')['default']
     Blogs: typeof import('./components/Blogs.vue')['default']
     ChartComponent: typeof import('./components/ChartComponent.vue')['default']
     Chatbot: typeof import('./components/Chatbot.vue')['default']
@@ -25,6 +27,7 @@ declare module 'vue' {
     MonacoEditor: typeof import('./components/MonacoEditor.vue')['default']
     MonacoInput: typeof import('./components/MonacoInput.vue')['default']
     Navbar: typeof import('./components/Navbar.vue')['default']
+    NavigationDrawer: typeof import('./components/NavigationDrawer.vue')['default']
     Notifier: typeof import('./components/Notifier.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']

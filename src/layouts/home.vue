@@ -1,6 +1,6 @@
-import { use } from 'matter';
 <template>
-  <main class="h-screen w-full col center">
+  <main class="h-full min-h-screen w-full col center">
     <RouterView />
+      <NavigationDrawer />
   </main>
 </template>

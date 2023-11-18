@@ -22,6 +22,7 @@ const rxProps = reactive(props);
 watch(done, (newDone) => {
   if (newDone) {
     emit("done");
+    eventSource.value?.close();
   }
 });
 

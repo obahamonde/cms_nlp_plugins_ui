@@ -1,3 +1,5 @@
+import { Message, DocumentRef } from "~/types";
+
 export const useSpeech = (language: string) => {
   // Setup the speech recognition instance
   const speech = useSpeechRecognition({
@@ -17,7 +19,35 @@ export const useSpeech = (language: string) => {
 
   const fetchAudio = async (text: string) => {
     try {
-      const { data } = await useFetch(`/api/audio/${text}`, {
+      const { state } = useStore()
+      if (!state.user) return;
+      const { data: textData } = await useFetch(`/api/utterance?text=${text}`).text();
+      if (!textData.value) return;
+      const modelOutput = textData.value;
+      const [setMessage, _, __, ___] = useFirestore<Message>('messages');
+
+
+      const userMessage: Message = {
+        role: 'user',
+        content: text,
+        createdAt: new Date()
+      }
+      state.messages.unshift({ ...userMessage, user: { name: state.user.displayName!, photoURL: state.user.photoURL!, email: state.user.email! } })
+      await setMessage(userMessage, state.user)
+      const botMessage: Message = {
+        role: 'assistant',
+        content: modelOutput,
+        createdAt: new Date()
+      }
+      state.messages.unshift({
+        ...botMessage, user: {
+          name: state.user.displayName!,
+          photoURL: state.user.photoURL!,
+          email: state.user.email!
+        }
+      })
+      await setMessage(botMessage, state.user)
+      const { data } = await useFetch(`/api/audio?text=${modelOutput}`, {
         method: "GET",
       }).blob();
       if (!data.value) return;

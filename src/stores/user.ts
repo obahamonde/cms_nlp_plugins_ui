@@ -1,16 +1,22 @@
 import { DocumentRef } from "./../types/user";
-import type { Message } from "~/types";
+import type { Message, Assistant } from "~/types";
+import type { FileObject, Thread } from "~/types";
+
 import { User } from "firebase/auth";
 import { defineStore, acceptHMRUpdate } from "pinia";
+
 
 export const useStore = defineStore("state", () => {
   const state = reactive({
     name: "",
     notifications: [] as { message: string; status: string }[],
-    eventSource: null as EventSource | null,
     messages: [] as DocumentRef<Message>[],
     token: null as string | null,
+    files: [] as DocumentRef<FileObject>[],
+    threads: [] as DocumentRef<Thread>[],
+    assistants: [] as DocumentRef<Assistant>[],
     user: null as User | null,
+    threadId: null as string | null,
   });
 
   const setState = (newState: any) => {

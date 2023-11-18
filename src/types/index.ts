@@ -1,2 +1,5 @@
 export * from "./user";
-export * from "./functions";
+export * from "./assistant";
+export * from "./thread";
+export * from "./file";
+export * from "./run";

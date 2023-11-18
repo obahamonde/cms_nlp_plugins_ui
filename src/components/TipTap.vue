@@ -10,7 +10,7 @@ type Post = {
   updatedAt: Date;
 };
 
-const [getPosts, addPost, posts] = useFirestore<Post>("posts");
+const [setPost, getPosts, delPosts, posts] = useFirestore<Post>("posts");
 const title = ref("");
 const { modelValue } = defineModels<{
   modelValue: string;
@@ -71,7 +71,7 @@ const savePost = async () => {
     content,
     updatedAt: new Date(),
   };
-  await addPost(post, state.user!);
+  await setPost(post, state.user!);
 };
 
 onMounted(() => {

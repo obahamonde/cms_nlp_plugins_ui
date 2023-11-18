@@ -3,25 +3,32 @@ export const useServerEvent = <T>(url: string, options: EventSourceInit) => {
   const data = ref<string>("");
   const done = ref<boolean>(false); // To track if the response is done
   const error = ref<Event | null>(null);
-
+  const event = ref<string>("done");
   onMounted(() => {
     eventSource.value = new EventSource(url, options);
-    eventSource.value.onmessage = (event: MessageEvent) => {
-      data.value += event.data;
+    eventSource.value.onmessage = (e: MessageEvent) => {
+      data.value += e.data;
+      if (data.value && !e.data) {
+        done.value = true;
+        eventSource.value?.close();
+      }
     };
-    eventSource.value.onerror = (event: Event) => {
-      error.value = event;
+
+    eventSource.value.onerror = (e: Event) => {
+      error.value = e;
       eventSource.value?.close();
     };
-    eventSource.value.addEventListener("done", (event: MessageEvent) => {
+    eventSource.value.addEventListener((event.value), () => {
       done.value = true;
       eventSource.value?.close();
-    });
-  });
+    }
+    );
+  }
+  );
 
   onBeforeUnmount(() => {
     eventSource.value?.close();
   });
 
-  return { data, done, error, eventSource }; // Include done in the return value
+  return { data, done, error, eventSource, event };
 };

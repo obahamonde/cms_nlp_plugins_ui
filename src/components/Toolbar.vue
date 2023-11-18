@@ -1,65 +1,27 @@
 <script setup lang="ts">
-import Chatbot from "~/components/Chatbot.vue";
-import Functions from "~/components/Functions.vue";
-import Blogs from "~/components/Blogs.vue";
-import CodeEditor from "~/components/CodeEditor.vue";
-import Threads from "~/components/Threads.vue";
+import { RouterLink } from 'vue-router';
 const { logIn, logOut, user } = useAuth();
-
-const MAPPING = {
-  chatbot: Chatbot,
-  functions: Functions,
-  blog: Blogs,
-  code: CodeEditor,
-  threads: Threads,
-};
-
-const modal = ref<string | null>(null);
-const tabs = ref([
+const routes = ref([
   {
-    name: "Chatbot",
+    title: "Chatbot",
     icon: "mdi-chat",
-    key: "chatbot",
+    to: "/",
   },
   {
-    name: "Threads",
-    icon: "mdi-forum",
-    key: "threads",
-  },
-  {
-    name: "Functions",
-    icon: "mdi-function-variant",
-    key: "functions",
-  },
-  {
-    name: "Blog Editor",
+    title: "Blog Editor",
     icon: "mdi-pencil-box-outline",
-    key: "blog",
+    to: "/blog",
   },
   {
-    name: "Code Editor",
+    title: "Code Editor",
     icon: "mdi-code-braces",
-    key: "code",
-  },
+    to: "/code",
+  }
 ]);
-
-const handleModal = (key: string) => {
-  modal.value = modal.value === key ? null : key;
-};
-
-const get = (key: string) => {
-  //@ts-ignore
-  return MAPPING[key] || Chatbot;
-};
 </script>
 <template>
-  <Modal v-if="modal" @close="modal = null">
-    <template #body>
-      <component :is="get(modal)" :user="user" :mounted="true" />
-    </template>
-  </Modal>
   <div
-    class="row center rounded-full bg-zinc-800 p-2 max-w-max animate-fade-in-up my-8 mx-auto bottom-0 right-0 left-0 absolute"
+    class="row center rounded-full bg-zinc-800 p-2 max-w-max animate-fade-in-up my-8 mx-auto bottom-0 right-0 left-0 absolute z-50"
   >
     <div class="flex space-x-2 border-r border-zinc-600 px-3">
       <Icon
@@ -71,20 +33,19 @@ const get = (key: string) => {
       <img :src="user?.photoURL!" class="rounded-full w-8 h-8" v-if="user" />
     </div>
     <div class="flex space-x-2 border-r border-zinc-600 pr-1" v-if="user">
-      <Microphone />
-      <button class="toolbar-btn cp" :title="tab.name" v-for="tab in tabs">
+    
+      <RouterLink class="toolbar-btn cp" :title="tab.title" :to="tab.to" v-for="tab in routes">
         <Icon
           :icon="tab.icon"
           class="x2"
           :class="
-            modal === tab.key
+            tab.to === $route.path
               ? 'text-secondary'
-              : 'text-accent hover:text-secondary'
-          "
-          @click="handleModal(tab.key)"
-        />
-        <span class="sr-only">{{ tab.name }}</span>
-      </button>
+              : 'text-primary hover:text-secondary'  
+        "/>
+
+        <span class="sr-only">{{ tab.title }}</span>
+      </RouterLink>
 
       <button class="toolbar-btn cp" title="Logout">
         <Icon
@@ -97,7 +58,7 @@ const get = (key: string) => {
       <button class="toolbar-btn cp" title="Dark Mode">
         <Icon
           icon="mdi-theme-light-dark"
-          class="x2 text-gray-500 hover:text-warning"
+          class="x2 text-gray-500 hover:text-warning" 
           @click="toggleDark()"
         />
         <span class="sr-only">Dark Mode</span>

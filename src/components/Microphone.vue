@@ -15,7 +15,7 @@ const handleSpeech = async () => {
     <Icon
       :icon="isListening ? 'mdi-microphone-off' : 'mdi-microphone'"
       @click="handleSpeech()"
-      class="x2 text-primary"
+      class="x2 text-primary  hover:text-white"
     />
   </button>
 </template>

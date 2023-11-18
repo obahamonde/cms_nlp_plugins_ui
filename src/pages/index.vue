@@ -2,14 +2,11 @@
 const { state } = useStore();
 </script>
 <template>
-  <main class="h-screen w-full">
-    <Landing v-if="!state.user" />
-
-    <TipTap class="h-full w-full" v-else />
-  </main>
+<div class="top-0 absolute ">
+  <Threads :user="state.user"/>
+   <Chatbot :user="state.user" v-if="state.threadId"/>
+  </div>
 </template>
-<route lang="yaml">
-meta:
-  layout: "home"
-</route>
-w
+<style scoped>
+
+</style>

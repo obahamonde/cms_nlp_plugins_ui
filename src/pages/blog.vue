@@ -1,6 +1,9 @@
 <script setup lang="ts">
-useAuth()
+
 </script>
 <template>
-  <RouterView />
+<div><TipTap/></div>
 </template>
+<style scoped>
+
+</style>

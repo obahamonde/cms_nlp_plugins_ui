@@ -6,39 +6,42 @@ const [setThread, getThreads, delThread, threads] =
 const props = defineProps<{
   user: User;
 }>();
+const { request, response } = useRequest<Thread>();
+const { state } = useStore();
 const createThread = async () => {
-  const res = await fetch("/api/thread");
-  const data = await res.json();
-  threads.value.push(data);
-  await setThread(data, props.user);
+  await request("/api/threads", {
+    method: "POST",
+      });
+  response.value.metadata.id = response.value.id;
+  await setThread(response.value,props.user);
 };
-const deleteThread = async (id:string) => {
-  await delThread(id);
-  await useFetch("/api/thread/"+id, { method: "DELETE" });
-  threads.value = threads.value.filter((thread) => thread.id !== id);
+const deleteThread = async (thread:Thread) => {
+  await delThread(thread.id,props.user);
+  await request(`/api/threads/${thread.metadata.id}`, { method: "DELETE" });
 };
-onMounted(async () => {
-  await getThreads(props.user);
-});
+onMounted(async() => {
+  getThreads(props.user)
+}
+);
 </script>
+
 <template>
   <section>
-    <h1>Threads</h1>
-    <div
-      v-for="thread in threads"
-      :key="thread.id"
-      class="sh col center text-accent p-4 rounded"
-    >
-      <Icon
-        icon="mdi-delete"
-        class="x2 text-primary cp"
-        @click="deleteThread(thread.id!)"
-      />
-      <p>{{ thread.id   }}</p>
-      <p>{{ thread.created_at}}</p>
-    </div>
-    <div class="col center">
-    <button class="btn-get rf" @click="createThread"><Icon class="x2" icon="mdi-plus"/> </button>
+    <nav class="col start tl fixed w-72 gap-4 m-4 h-screen">
+      <button class="btn-get rounded row center" @click="createThread">
+        <Icon class="x2" icon="mdi-plus"/>New Thread
+      </button>
+      <div v-for="thread in threads" class="text-xs row start gap-2 sh p-2 rounded-lg w-36"
+      :class="{'bg-primary text-white': state.threadId === thread.id}"
+      >
+        <Icon class="x1 text-warning opacity-50 hover:text-error hover:opacity-100 cp" 
+             icon="mdi-delete" 
+             @click="deleteThread(thread)"/>
+        <strong class="hover:underline cp" @click="state.threadId = thread.metadata.id">
+          {{ new Date(thread.created_at*1000).toLocaleString() }}
+        </strong>
       </div>
+      <Assistant class="bottom-8 absolute" :user="props.user" />
+    </nav>
   </section>
 </template>
