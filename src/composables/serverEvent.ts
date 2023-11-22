@@ -1,4 +1,4 @@
-export const useServerEvent = <T>(url: string, options: EventSourceInit) => {
+export const useServerEvent = (url: string, options: EventSourceInit) => {
   const eventSource = ref<EventSource | null>(null);
   const data = ref<string>("");
   const done = ref<boolean>(false); // To track if the response is done

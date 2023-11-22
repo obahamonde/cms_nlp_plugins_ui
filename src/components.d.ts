@@ -31,6 +31,7 @@ declare module 'vue' {
     Notifier: typeof import('./components/Notifier.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    Run: typeof import('./components/Run.vue')['default']
     SeoSearchTags: (typeof import("./components/SeoSearchTags.vue"))["default"]
     SeoTagItem: (typeof import("./components/SeoTagItem.vue"))["default"]
     ServerEvent: typeof import('./components/ServerEvent.vue')['default']

@@ -1,11 +1,12 @@
 
 type Assistant = {
 	id: string;
+	picture: string;
 	created_at: number;
 	description: string;
 	file_ids: string[];
 	instructions: string;
-	metadata: Object;
+	metadata: Record<string, any>;
 	model: string;
 	name: string;
 	object: "assistant";

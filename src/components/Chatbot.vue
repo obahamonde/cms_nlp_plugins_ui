@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { User } from "@firebase/auth";
-import { Message } from "~/types";
+import { Message,FileObject } from "~/types";
 const [setMessage,getMessages,_,messages] = useFirestore<Message>('messages'); 
-
+const [__,___,____,files] = useFirestore<FileObject>('uploads');
 const props = defineProps<{
   user: User;
 }>();
@@ -14,8 +14,22 @@ const handleSend = (data: string) => {
   state.messages[0].content = data;
 };
 
-
-
+const useVision = async (url:string) => {
+  const res = await fetch(`/api/vision?url=${url}&text=${unref(modelValue)}`);
+  const d = await res.text();
+  state.messages.unshift({
+    role: "assistant",
+    content: d,
+    user: {
+      name: props.user.displayName!,
+      photoURL: props.user.photoURL!,
+      id: props.user.uid,
+      email: props.user.email!,
+    },
+    threadId: state.threadId!,
+    createdAt: new Date(),
+  });
+};
 
 const handleEnter = () => {
   if (!state.threadId) return;
@@ -53,9 +67,9 @@ const handleDone = async () => {
 };
 const fileIds = ref<string[]>([]);
 const fileQuery = computed(() => fileIds.value.join(","));
-onMounted(async () => {
+onMounted(() => {
   if (!props.user) return;
-  await getMessages(props.user);
+  getMessages(props.user);
   // @ts-ignore
   state.messages = messages.value.filter((message) => message.threadId === state.threadId);
 });
@@ -77,6 +91,12 @@ const handlePush = async () => {
       thread_id: state.threadId!,
       file_ids: fileQuery.value,
     });
+    await setMessage({
+      role: "user",
+      content: text,
+      threadId: state.threadId!,
+      createdAt: new Date(),
+    },props.user);
     const res = await fetch(`/api/messages?${urlParams.toString()}`);
     const data = await res.json();
     console.log(data);
@@ -86,12 +106,64 @@ const handlePush = async () => {
   fileIds.value = [];
   modelValue.value = "";
 };
+const running = ref("")
+const run = async (run:any) => {
+  console.log(run)
+  if (!props.user) return;
+  if (!state.threadId) return;
+  running.value = run.id
+ 
+}
+const url = computed(()=>{
+  if (!state.threadId) return
+  if (!running.value) return
+  return `/api/events?thread_id=${state.threadId}&run_id=${running.value}`
+})
+const eventSource = computed(()=>{
+  if (!url.value) return
+  return new EventSource(url.value)
+})
 
+const data = ref("")
+
+watch(eventSource, (es) => {
+  if (!es) return;
+  es.onmessage = (e) => {
+    data.value = e.data;
+  };
+  es.addEventListener("done", (e) => {
+    es.close();
+    running.value = ""
+    setMessage({
+      role: "assistant",
+      content: data.value,
+      threadId: state.threadId!,
+      createdAt: new Date(),
+    },props.user);
+  });
+});
+
+
+watch(data, (d) => {
+  if (!d) return;
+  state.messages.push({
+    user:{
+      id:props.user.uid,
+      name:props.user.displayName!,
+      photoURL:props.user.photoURL!,
+      email:props.user.email
+    },
+    content:d,
+    role:"assistant",
+    createdAt: new Date(),
+    threadId:state.threadId!,
+    }
+  );
+});
 
 </script>
 <template>
   <section class="col center  ">
-    
     <div class="row center  p-1 sticky top-4 dark:bg-black bg-white sh rounded-lg w-full" >
         <Microphone />
       <Input
@@ -102,9 +174,13 @@ const handlePush = async () => {
       <button class="rf bg-blue px-2 py-1 text-white">{{ fileIds.length }}</button>
       <button  class="toolbar-btn cp">
       <Icon icon="mdi-upload" class="text-primary x2 hover:text-white" @click="showModal = true" />
-        </button>
-        <button class="toolbar-btn cp">
+        </button><button class="toolbar-btn cp">
       <Icon icon="mdi-send" class="text-primary x2 hover:text-white" @click="handlePush" />
+        </button>
+    
+    
+        <button class="toolbar-btn cp" v-if="state.assistant" >
+      <Run :user="props.user"  :assistant_id="state.assistant.metadata.id" @run="run($event)" />
         </button>
         </div>
     <div class="chat-wrapper w-full max-w-168 mt-12">
@@ -128,13 +204,13 @@ const handlePush = async () => {
       <ChatMessage
         :content="message.content"
         :reverse="message.role === 'user'"
-        :image="message.role === 'user' ? props.user.photoURL! : '/chatbot.svg'"
+        :image="message.role === 'user' ? props.user.photoURL! : state.assistant.picture ? state.assistant.picture : './chatbot.svg'"
       />
     </div>
   </section>
   <Modal v-if="showModal" @close="showModal = false">
     <template #body>
-      <div v-for="f in state.files">
+      <div v-for="f in files">
        <div v-if="f.status_details.includes('image')"
       class="sh rounded"
       
@@ -144,7 +220,9 @@ const handlePush = async () => {
   <Modal v-if="showModal" @close="showModal = false">
       <template #body>
        <textarea v-model="modelValue"></textarea>
-        <button class="btn-get" @click="useVision(f.metadata!.url)">Get</button>
+        <button class="btn-icon" @click="useVision(f.metadata!.url)"><Icon 
+        icon="mdi-eye" class="text-primary x2 hover:text-white" />
+        </button>
       </template>
     </Modal>
   </div>
@@ -169,4 +247,5 @@ const handlePush = async () => {
     </div>
  </template>
   </Modal>
+   
 </template>

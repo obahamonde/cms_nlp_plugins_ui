@@ -1,22 +1,21 @@
 
-import type { User } from "firebase/auth";
+import type { Run } from "../types";
 
-export const usePubSub = <T>(user: User) => {
-  const { data, event, error, close, eventSource } = useEventSource(
-    `/api/events/${user.uid}`,
-  );
-  const result = computed(() => {
-    if (!data.value) return;
-    return JSON.parse(data.value) as T;
-  });
+export const usePubSub = (run: Run) => {
+  const { state } = useStore();
+  if (!state.threadId) return;
+  const { data, error, close, eventSource } = useEventSource(
+    `/api/events?thread_id${state.threadId}&run_id=${run.metadata.id!}`,
+  );;
 
   onBeforeUnmount(() => {
     close();
   });
 
   return {
+    data,
     error,
     eventSource,
-    result,
+
   };
 };

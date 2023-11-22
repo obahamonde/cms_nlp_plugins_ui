@@ -21,7 +21,7 @@ const routes = ref([
 </script>
 <template>
   <div
-    class="row center rounded-full bg-zinc-800 p-2 max-w-max animate-fade-in-up my-8 mx-auto bottom-0 right-0 left-0 absolute z-50"
+    class="row center rounded-full bg-zinc-800 p-2 max-w-max animate-fade-in-up my-8 mx-auto bottom-0 right-0 left-0 fixed z-50"
   >
     <div class="flex space-x-2 border-r border-zinc-600 px-3">
       <Icon
@@ -54,14 +54,6 @@ const routes = ref([
           @click="logOut()"
         />
         <span class="sr-only">Logout</span>
-      </button>
-      <button class="toolbar-btn cp" title="Dark Mode">
-        <Icon
-          icon="mdi-theme-light-dark"
-          class="x2 text-gray-500 hover:text-warning" 
-          @click="toggleDark()"
-        />
-        <span class="sr-only">Dark Mode</span>
       </button>
     </div>
   </div>

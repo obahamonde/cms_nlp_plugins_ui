@@ -14,7 +14,7 @@ export const useStore = defineStore("state", () => {
     token: null as string | null,
     files: [] as DocumentRef<FileObject>[],
     threads: [] as DocumentRef<Thread>[],
-    assistants: [] as DocumentRef<Assistant>[],
+    assistant: {} as DocumentRef<Assistant>,
     user: null as User | null,
     threadId: null as string | null,
   });
@@ -26,14 +26,6 @@ export const useStore = defineStore("state", () => {
   const notify = (message: string, status: string) => {
     state.notifications.push({ message, status });
   };
-
-  watchEffect(() => {
-    if (state.eventSource) {
-      state.eventSource.onmessage = (event: MessageEvent) => {
-        state.messages.push(event.data);
-      };
-    }
-  });
 
   return {
     state,

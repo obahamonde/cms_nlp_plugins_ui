@@ -1,15 +1,16 @@
 <script setup lang="ts">
-import type { FileObject as FileData, Message } from "~/types";
+import type { FileObject as FileData, FileObject, Message } from "~/types";
+ // @ts-ignore
 import { User } from "@firebase/auth";
 const props = defineProps<{
   user: User;
 }>();
 const [setFile, getFiles, delFile, files] = useFirestore<FileData>("uploads");
-const [setMessage, getMessages, _, messages] = useFirestore<Message>(
+const [setMessage, _, __, ___] = useFirestore<Message>(
   "messages"
 );
 const {  request } = useRequest<FileData>();
-const { uploadFile, deleteFile, __, fileObj } = useFirebaseStorage();
+const { uploadFile, deleteFile, fileObj } = useFirebaseStorage();
 const { state } = useStore();
 onMounted(async () => {
   getFiles(props.user);
@@ -44,7 +45,7 @@ const addFile = async (f: File, user: User) => {
 };
 const removeFile = async (id: FileData) => {
 	try {
-		await request(`/api/files/${id.metadata.id}`, {
+		await request(`/api/files/${id.metadata!.id}`, {
 			method: "DELETE",
 		});
 		await deleteFile(id.metadata!.id);
@@ -175,7 +176,7 @@ const inputHook = () => {
       class="sh col center text-accent p-4 rounded"
     >
     <Icon class="x1 text-red right-2 absolute opacity-25 hover:opacity-100 cp scale" icon="mdi-delete" 
-        @click="removeFile(f)"
+        @click="removeFile(f as FileObject)"
         />
     <div v-if="f.status_details.includes('image')"
       class="sh rounded"

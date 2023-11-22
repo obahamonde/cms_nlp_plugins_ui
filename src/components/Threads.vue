@@ -36,7 +36,7 @@ onMounted(async() => {
       >
         <Icon class="x1 text-warning opacity-50 hover:text-error hover:opacity-100 cp" 
              icon="mdi-delete" 
-             @click="deleteThread(thread)"/>
+             @click="deleteThread(thread as Thread)"/>
         <strong class="hover:underline cp" @click="state.threadId = thread.metadata.id">
           {{ new Date(thread.created_at*1000).toLocaleString() }}
         </strong>

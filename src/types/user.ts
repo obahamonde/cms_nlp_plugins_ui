@@ -2,7 +2,7 @@ export type UserState = {
   id: string;
   name: string;
   photoURL: string;
-  email?: string;
+  email?: string | null;
 };
 
 export type Message = {
